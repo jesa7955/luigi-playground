@@ -1,0 +1,27 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+mypy = "*"
+flake8 = "*"
+yapf = "*"
+python-language-server = {extras = ["all"],version = "*"}
+black = "*"
+
+[packages]
+luigi = "*"
+scikit-learn = "*"
+numpy = "*"
+pandas = "*"
+gokart = "*"
+pyknp = "*"
+jaconv = "*"
+
+[requires]
+python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true

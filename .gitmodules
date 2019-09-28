@@ -1,0 +1,3 @@
+[submodule "ABSA-BERT-pair"]
+	path = ABSA-BERT-pair
+	url = https://github.com/HSLCY/ABSA-BERT-pair
