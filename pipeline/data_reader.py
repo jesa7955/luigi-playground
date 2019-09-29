@@ -45,20 +45,20 @@ class ChabsaJsonReader(gokart.TaskOnKart):
                                 'id': sentence_id,
                                 'text': text,
                             })
-        self.dump(results)
+        self.dump(pd.DataFrame(results))
 
 
 class GenerateTextTargetPairs(gokart.TaskOnKart):
     task_namespace = "absa_bert"
     absa_base_path = luigi.Parameter()
-    task_format = luigi.Parameter()
+    task_name = luigi.Parameter()
     logger = logging.getLogger("luigi")
 
     def requires(self):
         return ChabsaJsonReader(base_path=self.absa_base_path)
 
     def output(self):
-        return self.make_target("chaABSA_Text_Target_Pair.csv")
+        return self.make_target("chaABSA_sentence_target_pair.csv")
 
     def run(self):
         source = self.load()
@@ -76,15 +76,15 @@ class GenerateTextTargetPairs(gokart.TaskOnKart):
 
 class GenearteSentimentAnalysisData(gokart.TaskOnKart):
     task_namespace = "absa_bert"
-    task_format = luigi.Parameter()
+    task_name = luigi.Parameter()
     absa_base_path = luigi.Parameter()
 
     def requires(self):
         return GenerateTextTargetPairs(absa_base_path=self.absa_base_path,
-                                       task_format=self.task_format)
+                                       task_name=self.task_name)
 
     def output(self):
-        return self.make_target(f"{self.task_format}.tsv")
+        return self.make_target(f"{self.task_name}.tsv")
 
     def run(self):
         data = self.load()
@@ -95,11 +95,14 @@ class GenearteSentimentAnalysisData(gokart.TaskOnKart):
             splited = [
                 mrph.midasi for mrph in jumanpp.analysis(zenkaku).mrph_list()
             ]
-            qa_zenkaku = jaconv.h2z(
-                f"{row['target']}の{row['aspect']}は{row['sentiment']}",
-                ascii=True,
-                digit=True,
-            )
+            if self.task_name == 'QA_B':
+                qa_zenkaku = jaconv.h2z(
+                    f"{row['target']}の{row['aspect']}は{row['sentiment']}",
+                    ascii=True,
+                    digit=True,
+                )
+            else:
+                qa_zenkaku = "　"
             qa_splited = [
                 mrph.midasi
                 for mrph in jumanpp.analysis(qa_zenkaku).mrph_list()
